@@ -17,12 +17,29 @@ gem 'validates_hostname', '~> 1.0'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 
+# For better performance in json responses
+gem 'jsonapi-serializer'
+
+# To allow swagger docs
+gem 'rswag-api'
+gem 'rswag-ui'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'database_cleaner'
   gem 'faker'
   gem 'rspec-rails'
+  # To easily find and avoid N+1 queries
+  gem 'bullet'
+  # Swag docs for API
+  gem 'rswag-specs'
+end
+
+group :test do
+  gem 'shoulda-matchers'
+  # Coverage
+  gem 'simplecov', require: false
 end
 
 group :development do
