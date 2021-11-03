@@ -17,8 +17,8 @@ gem 'validates_hostname', '~> 1.0'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 
-# For better performance in json responses
-gem 'jsonapi-serializer'
+# Serializer that makes easy to build non-standard json serializers
+gem 'blueprinter'
 
 # To allow swagger docs
 gem 'rswag-api'

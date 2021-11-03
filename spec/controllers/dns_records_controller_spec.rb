@@ -341,6 +341,200 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
   end
 
   describe '#create' do
-    # TODO
+    let(:ip) { '1.1.1.1' }
+    let(:malformatted_ip) { '1111.1.1.1' }
+
+    let(:lorem) { 'lorem.com' }
+    let(:ipsum) { 'ipsum.com' }
+    let(:dolor) { 'dolor.com' }
+    let(:amet) { 'amet.com' }
+    let(:sit) { 'sit.com' }
+
+    context 'with required ip param and no hostname_attributes' do
+      let(:payload) do
+        {
+          dns_records: {
+            ip: ip
+          }
+        }.to_json
+      end
+
+      before :each do
+        request.accept = 'application/json'
+        request.content_type = 'application/json'
+
+        post(:create, body: payload, format: :json)
+      end
+
+      it 'responds with valid response' do
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'returns the id of the new dns_record' do
+        expect(parsed_body[:id]).to be_an(Integer)
+      end
+    end
+
+    context 'with required already existing ip' do
+      let(:payload) do
+        {
+          dns_records: {
+            ip: ip
+          }
+        }.to_json
+      end
+
+      before :each do
+        request.accept = 'application/json'
+        request.content_type = 'application/json'
+
+        post(:create, body: payload, format: :json)
+        post(:create, body: payload, format: :json)
+      end
+
+      it 'responds with bad request' do
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it 'returns the validation error message' do
+        expect(parsed_body).to include(:errors => ["Ip has already been taken"])
+      end
+    end
+
+    context 'with malformatted ip param' do
+      let(:payload) do
+        {
+          dns_records: {
+            ip: malformatted_ip
+          }
+        }.to_json
+      end
+
+      before :each do
+        request.accept = 'application/json'
+        request.content_type = 'application/json'
+
+        post(:create, body: payload, format: :json)
+      end
+
+      it 'responds with bad request' do
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it 'returns the validation error message' do
+        expect(parsed_body).to include(:errors => ["Ip is invalid"])
+      end
+    end
+
+    context 'without required ip param' do
+      let(:payload) do
+        {
+          dns_records: {
+            hostnames_attributes: [
+              {
+                hostname: dolor
+              },
+              {
+                hostname: sit
+              }
+            ]
+          }
+        }.to_json
+      end
+
+      before :each do
+        request.accept = 'application/json'
+        request.content_type = 'application/json'
+
+        post(:create, body: payload, format: :json)
+      end
+
+      it 'responds with bad request' do
+          expect(response).to have_http_status(:bad_request)
+      end
+
+      it 'returns the validation error message' do
+        expect(parsed_body).to include(:errors => ["Ip can't be blank", "Ip is invalid"])
+      end
+    end
+
+    context 'with required ip param and new hostname_attributes' do
+      let(:payload) do
+        {
+          dns_records: {
+            ip: ip,
+            hostnames_attributes: [
+              {
+                hostname: lorem
+              },
+              {
+                hostname: ipsum
+              },
+              {
+                hostname: dolor
+              },
+              {
+                hostname: amet
+              }
+            ]
+          }
+        }.to_json
+      end
+
+      before :each do
+        request.accept = 'application/json'
+        request.content_type = 'application/json'
+
+        post(:create, body: payload, format: :json)
+      end
+
+      it 'responds with valid response' do
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'returns the id of the new dns_record' do
+        expect(parsed_body[:id]).to be_an(Integer)
+      end
+    end
+
+    context 'with required ip param and aready existing hostname_attributes' do
+      let!(:hostname) { Hostname.create!(hostname: lorem )}
+      let(:payload) do
+        {
+          dns_records: {
+            ip: ip,
+            hostnames_attributes: [
+              {
+                hostname: lorem
+              },
+              {
+                hostname: ipsum
+              },
+              {
+                hostname: dolor
+              },
+              {
+                hostname: amet
+              }
+            ]
+          }
+        }.to_json
+      end
+
+      before :each do
+        request.accept = 'application/json'
+        request.content_type = 'application/json'
+
+        post(:create, body: payload, format: :json)
+      end
+
+      it 'responds with valid response' do
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'returns the id of the new dns_record' do
+        expect(parsed_body[:id]).to be_an(Integer)
+      end
+    end
   end
 end
